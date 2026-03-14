@@ -30,7 +30,7 @@ pub fn validate_transaction(
     }
 
     let mut pseudo_commits = Vec::with_capacity(tx.inputs.len());
-    
+
     for input in &tx.inputs {
         // 4. For each input: ring size == 11
         if input.ring.members.len() != 11 {
@@ -50,12 +50,12 @@ pub fn validate_transaction(
         if waecan_crypto::ring_sig::mlsag_verify(&input.ring, &input.ring_sig, &msg).is_err() {
             return Err(CoreError::InvalidRingSignature);
         }
-        
+
         pseudo_commits.push(input.pseudo_commit.clone());
     }
 
     let mut out_commits = Vec::with_capacity(tx.outputs.len());
-    
+
     for output in &tx.outputs {
         // 7. For each output: Bulletproof range proof is valid
         if !verify_range_proof_stub(&output.range_proof) {
@@ -100,6 +100,7 @@ fn verify_range_proof_stub(proof: &[u8]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::transaction::{TransactionInput, TransactionOutput};
     use curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
     use curve25519_dalek::scalar::Scalar;
     use ed25519_dalek::SecretKey;
@@ -107,7 +108,6 @@ mod tests {
     use rand_chacha::ChaCha20Rng;
     use waecan_crypto::pedersen::PedersenCommitment;
     use waecan_crypto::ring_sig::{mlsag_sign, Ring, RingMember};
-    use crate::transaction::{TransactionInput, TransactionOutput};
 
     fn make_valid_tx() -> Transaction {
         let mut rng = ChaCha20Rng::from_seed([42u8; 32]);
@@ -131,17 +131,24 @@ mod tests {
                 key_image: None,
             });
         }
-        members.insert(0, RingMember {
-            output_key: spend_pub,
-            key_image: Some((&spend_priv * waecan_crypto::hash::hash_to_point(&spend_pub.compress())).compress()),
-        });
+        members.insert(
+            0,
+            RingMember {
+                output_key: spend_pub,
+                key_image: Some(
+                    (&spend_priv * waecan_crypto::hash::hash_to_point(&spend_pub.compress()))
+                        .compress(),
+                ),
+            },
+        );
         let ring = Ring { members };
         let msg = [0u8; 32]; // matched in validation.rs
         let ring_sig = mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng);
 
         let input = TransactionInput {
             ring,
-            key_image: (&spend_priv * waecan_crypto::hash::hash_to_point(&spend_pub.compress())).compress(),
+            key_image: (&spend_priv * waecan_crypto::hash::hash_to_point(&spend_pub.compress()))
+                .compress(),
             ring_sig,
             pseudo_commit,
         };
@@ -174,38 +181,56 @@ mod tests {
     fn test_rule_1_version() {
         let mut tx = make_valid_tx();
         tx.version = 2;
-        assert!(matches!(validate_transaction(&tx, &HashSet::new()), Err(CoreError::InvalidVersion)));
+        assert!(matches!(
+            validate_transaction(&tx, &HashSet::new()),
+            Err(CoreError::InvalidVersion)
+        ));
     }
 
     #[test]
     fn test_rule_2_io_counts() {
         let mut tx = make_valid_tx();
         tx.inputs.clear();
-        assert!(matches!(validate_transaction(&tx, &HashSet::new()), Err(CoreError::NoInputs)));
+        assert!(matches!(
+            validate_transaction(&tx, &HashSet::new()),
+            Err(CoreError::NoInputs)
+        ));
 
         let mut tx2 = make_valid_tx();
         tx2.outputs.clear();
-        assert!(matches!(validate_transaction(&tx2, &HashSet::new()), Err(CoreError::InvalidOutputCount)));
+        assert!(matches!(
+            validate_transaction(&tx2, &HashSet::new()),
+            Err(CoreError::InvalidOutputCount)
+        ));
 
         let mut tx3 = make_valid_tx();
         for _ in 0..17 {
             tx3.outputs.push(tx3.outputs[0].clone());
         }
-        assert!(matches!(validate_transaction(&tx3, &HashSet::new()), Err(CoreError::InvalidOutputCount)));
+        assert!(matches!(
+            validate_transaction(&tx3, &HashSet::new()),
+            Err(CoreError::InvalidOutputCount)
+        ));
     }
 
     #[test]
     fn test_rule_3_min_fee() {
         let mut tx = make_valid_tx();
         tx.fee = MIN_FEE_ATOMIC - 1;
-        assert!(matches!(validate_transaction(&tx, &HashSet::new()), Err(CoreError::InsufficientFee)));
+        assert!(matches!(
+            validate_transaction(&tx, &HashSet::new()),
+            Err(CoreError::InsufficientFee)
+        ));
     }
 
     #[test]
     fn test_rule_4_ring_size() {
         let mut tx = make_valid_tx();
         tx.inputs[0].ring.members.pop(); // now size 10
-        assert!(matches!(validate_transaction(&tx, &HashSet::new()), Err(CoreError::InvalidRingSize)));
+        assert!(matches!(
+            validate_transaction(&tx, &HashSet::new()),
+            Err(CoreError::InvalidRingSize)
+        ));
     }
 
     #[test]
@@ -213,7 +238,10 @@ mod tests {
         let tx = make_valid_tx();
         let mut known = HashSet::new();
         known.insert(tx.inputs[0].key_image);
-        assert!(matches!(validate_transaction(&tx, &known), Err(CoreError::DoubleSpend)));
+        assert!(matches!(
+            validate_transaction(&tx, &known),
+            Err(CoreError::DoubleSpend)
+        ));
     }
 
     #[test]
@@ -221,22 +249,32 @@ mod tests {
         let mut tx = make_valid_tx();
         // Corrupt signature
         tx.inputs[0].ring_sig.c_0 = curve25519_dalek::scalar::Scalar::ZERO;
-        assert!(matches!(validate_transaction(&tx, &HashSet::new()), Err(CoreError::InvalidRingSignature)));
+        assert!(matches!(
+            validate_transaction(&tx, &HashSet::new()),
+            Err(CoreError::InvalidRingSignature)
+        ));
     }
 
     #[test]
     fn test_rule_7_bulletproof_valid() {
         let mut tx = make_valid_tx();
         tx.outputs[0].range_proof.clear(); // empty stub means invalid
-        assert!(matches!(validate_transaction(&tx, &HashSet::new()), Err(CoreError::InvalidRangeProof)));
+        assert!(matches!(
+            validate_transaction(&tx, &HashSet::new()),
+            Err(CoreError::InvalidRangeProof)
+        ));
     }
 
     #[test]
     fn test_rule_8_balance_proof() {
         let mut tx = make_valid_tx();
         // Modify input commitment to unbalance
-        tx.inputs[0].pseudo_commit = PedersenCommitment::commit(500, &curve25519_dalek::scalar::Scalar::ZERO);
-        assert!(matches!(validate_transaction(&tx, &HashSet::new()), Err(CoreError::BalanceMismatch)));
+        tx.inputs[0].pseudo_commit =
+            PedersenCommitment::commit(500, &curve25519_dalek::scalar::Scalar::ZERO);
+        assert!(matches!(
+            validate_transaction(&tx, &HashSet::new()),
+            Err(CoreError::BalanceMismatch)
+        ));
     }
 
     #[test]
@@ -244,25 +282,34 @@ mod tests {
         let mut tx = make_valid_tx();
         // 100,001 extra bytes forces serialized size > 100k
         tx.extra = vec![0u8; 100_001];
-        assert!(matches!(validate_transaction(&tx, &HashSet::new()), Err(CoreError::TooLarge)));
+        assert!(matches!(
+            validate_transaction(&tx, &HashSet::new()),
+            Err(CoreError::TooLarge)
+        ));
     }
 
     #[test]
     fn test_rule_10_extra_len() {
         let mut tx = make_valid_tx();
         tx.extra = vec![0u8; 256];
-        assert!(matches!(validate_transaction(&tx, &HashSet::new()), Err(CoreError::ExtraTooLarge)));
+        assert!(matches!(
+            validate_transaction(&tx, &HashSet::new()),
+            Err(CoreError::ExtraTooLarge)
+        ));
     }
 
     #[test]
     fn test_rule_11_tx_pubkey_subgroup() {
         let mut tx = make_valid_tx();
         tx.tx_public_key = ed25519_dalek::PublicKey::from_bytes(&[0u8; 32]).unwrap(); // identity / invalid points
-        // The dalek library may actually error on from_bytes if it's off-curve, but let's test a torsion point or zero.
-        // If parsed as identity, it will hit InvalidTxPublicKey.
-        assert!(matches!(validate_transaction(&tx, &HashSet::new()), Err(CoreError::InvalidTxPublicKey)));
+                                                                                      // The dalek library may actually error on from_bytes if it's off-curve, but let's test a torsion point or zero.
+                                                                                      // If parsed as identity, it will hit InvalidTxPublicKey.
+        assert!(matches!(
+            validate_transaction(&tx, &HashSet::new()),
+            Err(CoreError::InvalidTxPublicKey)
+        ));
     }
-    
+
     #[test]
     fn test_fee_burn_invariant() {
         // Assert fee never appears in outputs. The outputs contain commitments to value 99.
@@ -271,9 +318,9 @@ mod tests {
         let out_commit = &tx.outputs[0].commitment;
         let fee_commit = PedersenCommitment::commit_fee(tx.fee);
         assert_ne!(out_commit.commitment, fee_commit.commitment);
-        
-        // Fee burn is implicit in `verify_balance(&inputs, &outputs, fee)`. 
-        // It consumes the numeric fee in the equation, balancing it against inputs, 
+
+        // Fee burn is implicit in `verify_balance(&inputs, &outputs, fee)`.
+        // It consumes the numeric fee in the equation, balancing it against inputs,
         // but does NOT attach the fee amount to any output Pedersen Commitment.
     }
 }

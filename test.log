@@ -1,0 +1,54 @@
+[1m[92m    Updating[0m crates.io index
+[1m[92m     Locking[0m 47 packages to latest compatible versions
+[1m[92m      Adding[0m generic-array v0.14.7 [1m[33m(available: v0.14.9)[0m
+[1m[92m      Adding[0m rand v0.8.5 [1m[33m(available: v0.10.0)[0m
+[1m[92m      Adding[0m rand_chacha v0.3.1 [1m[33m(available: v0.10.0)[0m
+[1m[92m      Adding[0m thiserror v1.0.69 [1m[33m(available: v2.0.18)[0m
+[1m[92m   Compiling[0m waecan-node v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-node)
+[1m[92m   Compiling[0m waecan-crypto v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-crypto)
+[1m[92m   Compiling[0m waecan-cli v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-cli)
+[1m[92m   Compiling[0m waecan-miner v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-miner)
+[1m[92m   Compiling[0m waecan-mempool v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-mempool)
+[1m[92m   Compiling[0m waecan-p2p v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-p2p)
+[1m[92m   Compiling[0m waecan-rpc v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-rpc)
+[1m[92m   Compiling[0m waecan-wallet v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-wallet)
+[1m[92m   Compiling[0m waecan-storage v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-storage)
+[1m[92m   Compiling[0m waecan-core v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-core)
+[1m[91merror[E0432][0m[1m: unresolved import `ed25519_dalek::PublicKey`[0m
+ [1m[94m--> [0mcrates/waecan-core/src/block.rs:2:5
+  [1m[94m|[0m
+[1m[94m2[0m [1m[94m|[0m use ed25519_dalek::PublicKey;
+  [1m[94m|[0m     [1m[91m^^^^^^^^^^^^^^^^^^^^^^^^[0m [1m[91mno `PublicKey` in the root[0m
+
+[1m[91merror[E0432][0m[1m: unresolved import `ed25519_dalek::PublicKey`[0m
+ [1m[94m--> [0mcrates/waecan-core/src/transaction.rs:2:5
+  [1m[94m|[0m
+[1m[94m2[0m [1m[94m|[0m use ed25519_dalek::PublicKey;
+  [1m[94m|[0m     [1m[91m^^^^^^^^^^^^^^^^^^^^^^^^[0m [1m[91mno `PublicKey` in the root[0m
+
+[1m[91merror[E0308][0m[1m: mismatched types[0m
+  [1m[94m--> [0mcrates/waecan-core/src/block.rs:58:37
+   [1m[94m|[0m
+[1m[94m58[0m [1m[94m|[0m pub fn block_reward(height: u64) -> u64 {
+   [1m[94m|[0m        [1m[94m------------[0m                 [1m[91m^^^[0m [1m[91mexpected `u64`, found `()`[0m
+   [1m[94m|[0m        [1m[94m|[0m
+   [1m[94m|[0m        [1m[94mimplicitly returns `()` as its body has no tail or `return` expression[0m
+
+[1m[91merror[E0282][0m[1m: type annotations needed[0m
+  [1m[94m--> [0mcrates/waecan-core/src/validation.rs:84:12
+   [1m[94m|[0m
+[1m[94m84[0m [1m[94m|[0m         if point.mul_by_cofactor() == EdwardsPoint::default() {
+   [1m[94m|[0m            [1m[91m^^^^^[0m [1m[91mcannot infer type[0m
+
+[1m[91merror[E0308][0m[1m: mismatched types[0m
+  [1m[94m--> [0mcrates/waecan-core/src/validation.rs:95:45
+   [1m[94m|[0m
+[1m[94m95[0m [1m[94m|[0m fn verify_range_proof_stub(proof: &[u8]) -> bool {
+   [1m[94m|[0m    [1m[94m-----------------------[0m                  [1m[91m^^^^[0m [1m[91mexpected `bool`, found `()`[0m
+   [1m[94m|[0m    [1m[94m|[0m
+   [1m[94m|[0m    [1m[94mimplicitly returns `()` as its body has no tail or `return` expression[0m
+
+[1mSome errors have detailed explanations: E0282, E0308, E0432.[0m
+[1mFor more information about an error, try `rustc --explain E0282`.[0m
+[1m[91merror[0m: could not compile `waecan-core` (lib) due to 5 previous errors
+[1m[33mwarning[0m: build failed, waiting for other jobs to finish...

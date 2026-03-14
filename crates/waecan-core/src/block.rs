@@ -57,13 +57,13 @@ pub struct CoinbaseTx {
 /// Halves every 525,600 blocks asymptotically over 2-year epochs.
 pub fn block_reward(height: u64) -> u64 {
     let halvings = height / 525_600;
-    
-    // Once right-shifts exceed 63 on a u64, it might overflow or be zero 
+
+    // Once right-shifts exceed 63 on a u64, it might overflow or be zero
     // depending on architecture, but Rust allows checked_shr or we manually clamp
     if halvings >= 64 {
         return 0;
     }
-    
+
     let base_reward = 50 * ATOMIC_UNITS_PER_WAEC;
 }
 
@@ -98,19 +98,19 @@ mod tests {
     #[test]
     fn test_block_reward_schedule() {
         let base = 50 * ATOMIC_UNITS_PER_WAEC;
-        
+
         // height: 0
         assert_eq!(block_reward(0), base);
-        
+
         // height: 525_599 (just before first halving)
         assert_eq!(block_reward(525_599), base);
-        
+
         // height: 525_600 (first halving, right shifted by 1)
         assert_eq!(block_reward(525_600), base >> 1);
-        
+
         // height: 1_051_199 (just before second halving)
         assert_eq!(block_reward(1_051_199), base >> 1);
-        
+
         // height: 1_051_200 (second halving, right shifted by 2)
         assert_eq!(block_reward(1_051_200), base >> 2);
     }

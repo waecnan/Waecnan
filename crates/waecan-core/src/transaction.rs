@@ -36,7 +36,7 @@ impl Transaction {
         size += 32; // tx_public_key (Ed25519 point)
         size += 4 + self.extra.len(); // extra len prefix (u32) + extra bytes
 
-        // Each Input: 
+        // Each Input:
         // ring: 11 members * 32 bytes = 352
         // key_image: 32 bytes
         // ring_sig: 32 (key_image) + 32 (c_0) + (11 * 32) (s) = 416

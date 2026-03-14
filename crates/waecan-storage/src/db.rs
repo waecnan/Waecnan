@@ -54,12 +54,12 @@ impl WaecanDB {
         // 1. Store block header bytes (keyed by keccak256 hash)
         let header_bytes = block.header.serialize();
         let hash_id = waecan_crypto::hash::keccak256(&header_bytes);
-        batch.put_cf(block_cf, &hash_id, &header_bytes);
+        batch.put_cf(block_cf, hash_id, header_bytes);
 
         // 2. Update UTXO set: add new outputs
         for out in new_outputs {
             let serialized = out.serialize();
-            batch.put_cf(utxo_cf, out.output_key.as_bytes(), &serialized);
+            batch.put_cf(utxo_cf, out.output_key.as_bytes(), serialized);
         }
 
         // 3. Update UTXO set: remove spent outputs
@@ -71,12 +71,12 @@ impl WaecanDB {
         // 4. Record key images (double-spend prevention)
         for img in key_images {
             let img_bytes: &[u8; 32] = img.as_bytes();
-            batch.put_cf(key_images_cf, img_bytes, &block.header.height.to_le_bytes());
+            batch.put_cf(key_images_cf, img_bytes, block.header.height.to_le_bytes());
         }
 
         // 5. Update chain tip
-        batch.put_cf(meta_cf, b"tip_hash", &hash_id);
-        batch.put_cf(meta_cf, b"tip_height", &block.header.height.to_le_bytes());
+        batch.put_cf(meta_cf, b"tip_hash", hash_id);
+        batch.put_cf(meta_cf, b"tip_height", block.header.height.to_le_bytes());
 
         self.db.write(batch)?;
         Ok(())
@@ -108,7 +108,7 @@ impl WaecanDB {
         // 2. Restore outputs that were spent in this block
         for out in restored_outputs {
             let serialized = out.serialize();
-            batch.put_cf(utxo_cf, out.output_key.as_bytes(), &serialized);
+            batch.put_cf(utxo_cf, out.output_key.as_bytes(), serialized);
         }
 
         // 3. Remove key images this block added
@@ -119,7 +119,7 @@ impl WaecanDB {
 
         // 4. Update the chain tip to the previous block's height/hash
         batch.put_cf(meta_cf, b"tip_hash", new_tip_hash);
-        batch.put_cf(meta_cf, b"tip_height", &new_tip_height.to_le_bytes());
+        batch.put_cf(meta_cf, b"tip_height", new_tip_height.to_le_bytes());
 
         self.db.write(batch)?;
         Ok(())

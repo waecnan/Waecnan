@@ -11,9 +11,7 @@ env:
   RUST_BACKTRACE: 1
 
 permissions:
-  contents: write
-
-
+  contents: read
 
 jobs:
   test:
@@ -31,21 +29,10 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: cargo test
-        run: cargo test --workspace -- --nocapture > test.log 2>&1
-        continue-on-error: true
+        run: cargo test --workspace -- --nocapture
 
       - name: cargo clippy
-        run: cargo clippy --workspace -- -D warnings > clippy.log 2>&1
-        continue-on-error: true
-
-      - name: push logs and fmt
-        run: |
-          cargo fmt --all
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -am "ci: auto format and push logs" || exit 0
-          git push
+        run: cargo clippy --workspace -- -D warnings
 
       - name: cargo fmt check
         run: cargo fmt --all -- --check

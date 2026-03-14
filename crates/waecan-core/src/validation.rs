@@ -95,6 +95,7 @@ pub fn validate_transaction(
 fn verify_range_proof_stub(proof: &[u8]) -> bool {
     // A fully compliant node would verify the bulletproof over the Pedersen commitment
     // In this stub, we just consider non-empty bytes valid for testing structural validation flow
+    !proof.is_empty()
 }
 
 #[cfg(test)]
@@ -103,7 +104,6 @@ mod tests {
     use crate::transaction::{TransactionInput, TransactionOutput};
     use curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
     use curve25519_dalek::scalar::Scalar;
-    use ed25519_dalek::SecretKey;
     use rand::SeedableRng;
     use rand_chacha::ChaCha20Rng;
     use waecan_crypto::pedersen::PedersenCommitment;
@@ -112,9 +112,10 @@ mod tests {
     fn make_valid_tx() -> Transaction {
         let mut rng = ChaCha20Rng::from_seed([42u8; 32]);
         let mut spend_bytes = [0u8; 32];
-        rng.fill_bytes(&mut spend_bytes);
-        let spend_priv = SecretKey::from_bytes(&spend_bytes).unwrap();
-        let spend_pub = (&spend_priv).into();
+        rand::RngCore::fill_bytes(&mut rng, &mut spend_bytes);
+        // Ensure the scalar is valid and reduced
+        let spend_priv = curve25519_dalek::scalar::Scalar::from_bytes_mod_order(spend_bytes);
+        let spend_pub = &spend_priv * &ED25519_BASEPOINT_POINT;
 
         // Make pseudo commit = 100 WAEC
         let b_in = curve25519_dalek::scalar::Scalar::from(1u64);
@@ -154,7 +155,7 @@ mod tests {
         };
 
         let output = TransactionOutput {
-            output_key: spend_pub,
+            output_key: spend_pub.compress(),
             commitment: out_commit,
             range_proof: vec![1, 2, 3], // valid stub
             encrypted_amount: [0u8; 8],
@@ -165,7 +166,7 @@ mod tests {
             inputs: vec![input],
             outputs: vec![output],
             fee: MIN_FEE_ATOMIC,
-            tx_public_key: spend_pub,
+            tx_public_key: spend_pub.compress(),
             extra: vec![],
         }
     }
@@ -247,7 +248,7 @@ mod tests {
     #[test]
     fn test_rule_6_mlsag_verify() {
         let mut tx = make_valid_tx();
-        // Corrupt signature
+        // Corrupt signature properly with a scalar
         tx.inputs[0].ring_sig.c_0 = curve25519_dalek::scalar::Scalar::ZERO;
         assert!(matches!(
             validate_transaction(&tx, &HashSet::new()),
@@ -301,9 +302,7 @@ mod tests {
     #[test]
     fn test_rule_11_tx_pubkey_subgroup() {
         let mut tx = make_valid_tx();
-        tx.tx_public_key = ed25519_dalek::PublicKey::from_bytes(&[0u8; 32]).unwrap(); // identity / invalid points
-                                                                                      // The dalek library may actually error on from_bytes if it's off-curve, but let's test a torsion point or zero.
-                                                                                      // If parsed as identity, it will hit InvalidTxPublicKey.
+        tx.tx_public_key = CompressedEdwardsY::from_slice(&[0u8; 32]).unwrap(); // identity / invalid points
         assert!(matches!(
             validate_transaction(&tx, &HashSet::new()),
             Err(CoreError::InvalidTxPublicKey)

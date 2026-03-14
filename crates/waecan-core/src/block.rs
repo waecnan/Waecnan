@@ -1,5 +1,5 @@
 use crate::transaction::Transaction;
-use ed25519_dalek::PublicKey;
+use curve25519_dalek::edwards::CompressedEdwardsY;
 
 use crate::transaction::ATOMIC_UNITS_PER_WAEC;
 
@@ -47,7 +47,7 @@ pub struct Block {
 pub struct CoinbaseTx {
     pub height: u64,
     pub reward: u64,
-    pub miner_output_key: PublicKey,
+    pub miner_output_key: CompressedEdwardsY,
     /// Genesis message only used at height 0
     pub genesis_message: Vec<u8>,
 }
@@ -65,6 +65,7 @@ pub fn block_reward(height: u64) -> u64 {
     }
 
     let base_reward = 50 * ATOMIC_UNITS_PER_WAEC;
+    base_reward >> halvings
 }
 
 #[cfg(test)]

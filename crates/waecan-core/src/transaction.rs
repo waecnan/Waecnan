@@ -1,5 +1,4 @@
 use curve25519_dalek::edwards::CompressedEdwardsY;
-use ed25519_dalek::PublicKey;
 use waecan_crypto::pedersen::PedersenCommitment;
 use waecan_crypto::ring_sig::{Ring, RingSignature};
 
@@ -19,7 +18,7 @@ pub struct Transaction {
     /// Publicly verifiable transaction fee in atomic units (destroyed, not paid to miner)
     pub fee: u64,
     /// Transaction public key `R` for stealth address derivation
-    pub tx_public_key: PublicKey,
+    pub tx_public_key: CompressedEdwardsY,
     /// Optional extra data, max 255 bytes
     pub extra: Vec<u8>,
 }
@@ -36,7 +35,7 @@ impl Transaction {
         size += 32; // tx_public_key (Ed25519 point)
         size += 4 + self.extra.len(); // extra len prefix (u32) + extra bytes
 
-        // Each Input:
+        // Each Input: 
         // ring: 11 members * 32 bytes = 352
         // key_image: 32 bytes
         // ring_sig: 32 (key_image) + 32 (c_0) + (11 * 32) (s) = 416
@@ -75,7 +74,7 @@ pub struct TransactionInput {
 #[derive(Clone, Debug)]
 pub struct TransactionOutput {
     /// Recipient's one-time stealth address public key `P`
-    pub output_key: PublicKey,
+    pub output_key: CompressedEdwardsY,
     /// Pedersen commitment shielding the output amount
     pub commitment: PedersenCommitment,
     /// Bulletproof proving the amount is in [0, 2^64)

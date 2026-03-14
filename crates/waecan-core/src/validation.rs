@@ -129,22 +129,17 @@ mod tests {
         for _ in 0..10 {
             members.push(RingMember {
                 output_key: spend_pub,
-                key_image: None,
             });
         }
         members.insert(
             0,
             RingMember {
                 output_key: spend_pub,
-                key_image: Some(
-                    (&spend_priv * waecan_crypto::hash::hash_to_point(&spend_pub.compress()))
-                        .compress(),
-                ),
             },
         );
         let ring = Ring { members };
         let msg = [0u8; 32]; // matched in validation.rs
-        let ring_sig = mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng);
+        let ring_sig = mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng).expect("Failed to sign");
 
         let input = TransactionInput {
             ring,

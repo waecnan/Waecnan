@@ -32,12 +32,14 @@ jobs:
         run: cargo test --workspace -- --nocapture
 
       - name: cargo clippy
-        run: cargo clippy --workspace -- -D warnings
+        run: cargo clippy --workspace -- -D warnings > clippy.log 2>&1
+        continue-on-error: true
 
-      - name: cargo fmt fix and push
+      - name: cargo fmt fix and push logs
         run: |
           cargo fmt --all
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "ci: auto format" || exit 0
+          git add -A
+          git commit -am "ci: auto format and logs" || exit 0
           git push

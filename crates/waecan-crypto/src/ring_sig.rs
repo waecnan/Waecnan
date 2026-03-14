@@ -122,11 +122,7 @@ pub fn mlsag_sign(
         let l_i = s[i] * ED25519_BASEPOINT_POINT + challenges[i] * ring.members[i].output_key;
         let r_i = s[i] * hp_i + challenges[i] * key_image_point;
 
-        if next != real_index {
-            challenges[next] = ring_challenge(message, &l_i, &r_i);
-        } else {
-            challenges[0] = ring_challenge(message, &l_i, &r_i);
-        }
+        challenges[next] = ring_challenge(message, &l_i, &r_i);
     }
 
     // Close the ring.

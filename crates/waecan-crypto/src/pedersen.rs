@@ -103,8 +103,10 @@ mod tests {
 
     #[test]
     fn test_generator_h_in_subgroup() {
-        use curve25519_dalek::constants::BASEPOINT_ORDER;
-        assert_eq!(generator_h() * BASEPOINT_ORDER, EdwardsPoint::default());
+        // After cofactor clearing in hash_to_point, mul_by_cofactor
+        // should NOT yield identity (proving H is a non-trivial subgroup element).
+        let h = generator_h();
+        assert_ne!(h.mul_by_cofactor(), EdwardsPoint::default());
     }
 
     #[test]

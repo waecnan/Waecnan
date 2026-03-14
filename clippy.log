@@ -1,33 +1,12 @@
-[1m[92m   Compiling[0m libc v0.2.183
-[1m[92m   Compiling[0m cfg-if v1.0.4
-[1m[92m    Checking[0m curve25519-dalek v4.1.3
-[1m[92m   Compiling[0m libloading v0.8.9
-[1m[92m    Checking[0m thiserror v1.0.69
+[1m[92m    Checking[0m waecan-crypto v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-crypto)
+[1m[92m    Checking[0m waecan-wallet v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-wallet)
+[1m[92m    Checking[0m waecan-node v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-node)
 [1m[92m    Checking[0m waecan-miner v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-miner)
 [1m[92m    Checking[0m waecan-mempool v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-mempool)
-[1m[92m    Checking[0m waecan-p2p v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-p2p)
 [1m[92m    Checking[0m waecan-rpc v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-rpc)
-[1m[92m    Checking[0m waecan-node v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-node)
+[1m[92m    Checking[0m waecan-p2p v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-p2p)
 [1m[92m    Checking[0m waecan-cli v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-cli)
-[1m[92m    Checking[0m waecan-wallet v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-wallet)
-[1m[92m    Checking[0m getrandom v0.2.17
-[1m[92m    Checking[0m rand_core v0.6.4
-[1m[92m   Compiling[0m jobserver v0.1.34
-[1m[92m   Compiling[0m clang-sys v1.8.1
-[1m[92m    Checking[0m rand_chacha v0.3.1
-[1m[92m    Checking[0m ed25519-dalek v2.2.0
-[1m[92m   Compiling[0m cc v1.2.57
-[1m[92m    Checking[0m rand v0.8.5
-[1m[92m    Checking[0m waecan-crypto v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-crypto)
 [1m[92m    Checking[0m waecan-core v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-core)
-[1m[92m   Compiling[0m bzip2-sys v0.1.13+1.0.8
-[1m[92m   Compiling[0m lz4-sys v1.11.1+lz4-1.10.0
-[1m[92m   Compiling[0m libz-sys v1.1.25
-[1m[92m   Compiling[0m bindgen v0.72.1
-[1m[92m   Compiling[0m bindgen v0.65.1
-[1m[92m   Compiling[0m zstd-sys v2.0.16+zstd.1.5.7
-[1m[92m   Compiling[0m librocksdb-sys v0.11.0+8.1.1
-[1m[92m    Checking[0m rocksdb v0.21.0
 [1m[92m    Checking[0m waecan-storage v0.1.0 (/home/runner/work/Waecan/Waecan/crates/waecan-storage)
 [1m[91merror[E0433][0m[1m: failed to resolve: use of unresolved module or unlinked crate `curve25519_dalek`[0m
  [1m[94m--> [0mcrates/waecan-storage/src/db.rs:1:5
@@ -38,9 +17,9 @@
   [1m[94m= [0m[1mhelp[0m: if you wanted to use a crate named `curve25519_dalek`, use `cargo add curve25519_dalek` to add it to your `Cargo.toml`
 
 [1m[91merror[E0433][0m[1m: failed to resolve: use of unresolved module or unlinked crate `curve25519_dalek`[0m
- [1m[94m--> [0mcrates/waecan-storage/src/record.rs:1:5
+ [1m[94m--> [0mcrates/waecan-storage/src/record.rs:2:5
   [1m[94m|[0m
-[1m[94m1[0m [1m[94m|[0m use curve25519_dalek::edwards::CompressedEdwardsY;
+[1m[94m2[0m [1m[94m|[0m use curve25519_dalek::edwards::CompressedEdwardsY;
   [1m[94m|[0m     [1m[91m^^^^^^^^^^^^^^^^[0m [1m[91muse of unresolved module or unlinked crate `curve25519_dalek`[0m
   [1m[94m|[0m
   [1m[94m= [0m[1mhelp[0m: if you wanted to use a crate named `curve25519_dalek`, use `cargo add curve25519_dalek` to add it to your `Cargo.toml`
@@ -58,31 +37,31 @@
    [1m[94m|[0m                                       [1m[91m^^^[0m [1m[91mcannot infer type[0m
 
 [1m[91merror[E0282][0m[1m: type annotations needed[0m
-  [1m[94m--> [0mcrates/waecan-storage/src/db.rs:74:42
+  [1m[94m--> [0mcrates/waecan-storage/src/db.rs:76:17
    [1m[94m|[0m
-[1m[94m74[0m [1m[94m|[0m             batch.put_cf(&key_images_cf, img.as_bytes(), &block.header.height.to_le_bytes());
-   [1m[94m|[0m                                          [1m[91m^^^[0m [1m[91mcannot infer type[0m
+[1m[94m76[0m [1m[94m|[0m                 img.as_bytes(),
+   [1m[94m|[0m                 [1m[91m^^^[0m [1m[91mcannot infer type[0m
 
 [1m[91merror[E0282][0m[1m: type annotations needed[0m
-   [1m[94m--> [0mcrates/waecan-storage/src/db.rs:104:39
+   [1m[94m--> [0mcrates/waecan-storage/src/db.rs:108:39
     [1m[94m|[0m
-[1m[94m104[0m [1m[94m|[0m             batch.delete_cf(&utxo_cf, key.as_bytes());
+[1m[94m108[0m [1m[94m|[0m             batch.delete_cf(&utxo_cf, key.as_bytes());
     [1m[94m|[0m                                       [1m[91m^^^[0m [1m[91mcannot infer type[0m
 
 [1m[91merror[E0282][0m[1m: type annotations needed[0m
-   [1m[94m--> [0mcrates/waecan-storage/src/db.rs:114:45
+   [1m[94m--> [0mcrates/waecan-storage/src/db.rs:118:45
     [1m[94m|[0m
-[1m[94m114[0m [1m[94m|[0m             batch.delete_cf(&key_images_cf, img.as_bytes());
+[1m[94m118[0m [1m[94m|[0m             batch.delete_cf(&key_images_cf, img.as_bytes());
     [1m[94m|[0m                                             [1m[91m^^^[0m [1m[91mcannot infer type[0m
 
 [1m[91merror[E0308][0m[1m: mismatched types[0m
-   [1m[94m--> [0mcrates/waecan-storage/src/db.rs:126:9
+   [1m[94m--> [0mcrates/waecan-storage/src/db.rs:133:9
     [1m[94m|[0m
-[1m[94m125[0m [1m[94m|[0m       pub fn cf(&self, name: &'static str) -> Result<std::sync::Arc<rocksdb::BoundColumnFamily>, StorageError> {
-    [1m[94m|[0m                                               [1m[94m----------------------------------------------------------------[0m [1m[94mexpected `std::result::Result<std::sync::Arc<rocksdb::BoundColumnFamily<'_>>, error::StorageError>` because of return type[0m
-[1m[94m126[0m [1m[94m|[0m [1m[91m/[0m         self.db
-[1m[94m127[0m [1m[94m|[0m [1m[91m|[0m             .cf_handle(name)
-[1m[94m128[0m [1m[94m|[0m [1m[91m|[0m             .ok_or(StorageError::MissingColumnFamily(name))
+[1m[94m132[0m [1m[94m|[0m       ) -> Result<std::sync::Arc<rocksdb::BoundColumnFamily>, StorageError> {
+    [1m[94m|[0m            [1m[94m----------------------------------------------------------------[0m [1m[94mexpected `std::result::Result<std::sync::Arc<rocksdb::BoundColumnFamily<'_>>, error::StorageError>` because of return type[0m
+[1m[94m133[0m [1m[94m|[0m [1m[91m/[0m         self.db
+[1m[94m134[0m [1m[94m|[0m [1m[91m|[0m             .cf_handle(name)
+[1m[94m135[0m [1m[94m|[0m [1m[91m|[0m             .ok_or(StorageError::MissingColumnFamily(name))
     [1m[94m|[0m [1m[91m|___________________________________________________________^[0m [1m[91mexpected `Result<Arc<BoundColumnFamily<'_>>, ...>`, found `Result<&ColumnFamily, StorageError>`[0m
     [1m[94m|[0m
     [1m[94m= [0m[1mnote[0m: expected enum `std::result::Result<[1m[35mstd::sync::Arc<rocksdb::BoundColumnFamily<'_>>[0m, _>`

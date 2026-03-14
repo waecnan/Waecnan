@@ -60,6 +60,7 @@ pub fn hash_to_point(key: &CompressedEdwardsY) -> EdwardsPoint {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
 
     #[test]
     fn test_keccak256_known_vector() {

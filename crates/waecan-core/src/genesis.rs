@@ -12,7 +12,7 @@ pub const GENESIS_NONCE: u64 = 0;              // will be found by miner
 pub const GENESIS_MESSAGE: &[u8] = b"Waecnan: Privacy is not a privilege. 2025-03-15";
 
 /// Build the Waecan genesis block.
-pub fn build_genesis_block(miner_address: &str) -> Block {
+pub fn build_genesis_block(_miner_address: &str) -> Block {
     let header = BlockHeader {
         version:    1,
         prev_hash:  GENESIS_PREV_HASH,

@@ -28,9 +28,7 @@ fn asert_shift(anchor: u128, solvetime_diff: i64) -> u128 {
     if diff > 0 {
         let whole_shifts = diff / halflife;
         let remainder = diff % halflife;
-        let scaled = anchor
-            .saturating_mul((halflife + remainder) as u128)
-            / halflife as u128;
+        let scaled = anchor.saturating_mul((halflife + remainder) as u128) / halflife as u128;
         if whole_shifts >= 128 {
             u128::MAX
         } else {
@@ -45,9 +43,7 @@ fn asert_shift(anchor: u128, solvetime_diff: i64) -> u128 {
         let diff_abs = -diff;
         let whole_shifts = diff_abs / halflife;
         let remainder = diff_abs % halflife;
-        let scaled = anchor
-            .saturating_mul((halflife - remainder) as u128)
-            / halflife as u128;
+        let scaled = anchor.saturating_mul((halflife - remainder) as u128) / halflife as u128;
         if whole_shifts >= 128 {
             1u128
         } else {
@@ -98,9 +94,7 @@ mod tests {
 
     #[test]
     fn test_asert_anchor() {
-        let result = asert_next_target(
-            ANCHOR_BITS, 0, 0, 1, BLOCK_TIME_TARGET as u64,
-        );
+        let result = asert_next_target(ANCHOR_BITS, 0, 0, 1, BLOCK_TIME_TARGET as u64);
         assert_eq!(result, ANCHOR_BITS);
     }
 
@@ -109,7 +103,9 @@ mod tests {
         // 720 blocks in half the expected time → difficulty increases → target decreases
         let blocks: u64 = 720;
         let result = asert_next_target(
-            ANCHOR_BITS, 0, 0,
+            ANCHOR_BITS,
+            0,
+            0,
             blocks,
             blocks * (BLOCK_TIME_TARGET as u64) / 2,
         );
@@ -128,7 +124,9 @@ mod tests {
         // 720 blocks in double the expected time → difficulty decreases → target increases
         let blocks: u64 = 720;
         let result = asert_next_target(
-            ANCHOR_BITS, 0, 0,
+            ANCHOR_BITS,
+            0,
+            0,
             blocks,
             blocks * (BLOCK_TIME_TARGET as u64) * 2,
         );

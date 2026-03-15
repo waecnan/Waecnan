@@ -103,7 +103,7 @@ mod tests {
     use super::*;
     use crate::transaction::{Transaction, TransactionInput};
     use curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
-    use curve25519_dalek::scalar::Scalar;
+    use crate::transaction::TransactionOutput;
     use rand::SeedableRng;
     use rand_chacha::ChaCha20Rng;
     use waecan_crypto::pedersen::PedersenCommitment;

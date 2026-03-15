@@ -39,9 +39,11 @@ pub fn build_swarm(keypair: Keypair) -> Result<Swarm<WaecanBehaviour>, Box<dyn s
         .build()
         .map_err(|e| format!("gossipsub config error: {e}"))?;
 
-    let gossipsub =
-        gossipsub::Behaviour::new(MessageAuthenticity::Signed(keypair.clone()), gossipsub_config)
-            .map_err(|e| format!("gossipsub behaviour error: {e}"))?;
+    let gossipsub = gossipsub::Behaviour::new(
+        MessageAuthenticity::Signed(keypair.clone()),
+        gossipsub_config,
+    )
+    .map_err(|e| format!("gossipsub behaviour error: {e}"))?;
 
     // Identify
     let identify = identify::Behaviour::new(identify::Config::new(
@@ -88,10 +90,7 @@ pub fn broadcast_tx(
     tx_bytes: Vec<u8>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let topic = IdentTopic::new(TOPIC_TXS);
-    swarm
-        .behaviour_mut()
-        .gossipsub
-        .publish(topic, tx_bytes)?;
+    swarm.behaviour_mut().gossipsub.publish(topic, tx_bytes)?;
     Ok(())
 }
 

@@ -155,7 +155,8 @@ fn test_5_fee_burn_invariant() {
         let miner_fee = fee * 30 / 100;
         let burned_fee = fee - miner_fee;
         
-        let out_value = reward + miner_fee;
+        // The block's net change to the global UTXO set is: + reward (emission) - burned_fee (permanently destroyed)
+        let out_value = reward - burned_fee;
         let out_blind = Scalar::from(h_loop);
         total_blindings += out_blind;
 

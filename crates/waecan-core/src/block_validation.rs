@@ -208,9 +208,8 @@ mod tests {
 
         let input = TransactionInput {
             ring,
-            key_image: (&spend_priv
-                * waecan_crypto::hash::hash_to_point(&spend_pub.compress()))
-            .compress(),
+            key_image: (&spend_priv * waecan_crypto::hash::hash_to_point(&spend_pub.compress()))
+                .compress(),
             ring_sig,
             pseudo_commit,
         };

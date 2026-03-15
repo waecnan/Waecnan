@@ -31,5 +31,12 @@ jobs:
       - name: cargo clippy
         run: cargo clippy --workspace -- -D warnings
 
+      - name: cargo fmt
+        run: |
+          cargo fmt --all
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git diff --quiet || git commit -am "ci: auto-format" && git push
+
       - name: cargo fmt check
         run: cargo fmt --all -- --check

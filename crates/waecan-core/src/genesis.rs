@@ -4,8 +4,8 @@ use curve25519_dalek::edwards::CompressedEdwardsY;
 pub const GENESIS_PREV_HASH: [u8; 32] = [0u8; 32];
 pub const GENESIS_HEIGHT: u64 = 0;
 pub const GENESIS_TIMESTAMP: u64 = 1742000000; // 2025-03-15 UTC approx
-pub const GENESIS_BITS: u64 = 0x2007_FFFF;     // low difficulty for launch
-pub const GENESIS_NONCE: u64 = 0;              // will be found by miner
+pub const GENESIS_BITS: u64 = 0x2007_FFFF; // low difficulty for launch
+pub const GENESIS_NONCE: u64 = 0; // will be found by miner
 
 /// The genesis message embedded in the coinbase extra field.
 /// SHA-256 of the Wæcnan whitepaper — placeholder until whitepaper is final.
@@ -14,18 +14,18 @@ pub const GENESIS_MESSAGE: &[u8] = b"Waecnan: Privacy is not a privilege. 2025-0
 /// Build the Waecan genesis block.
 pub fn build_genesis_block(_miner_address: &str) -> Block {
     let header = BlockHeader {
-        version:    1,
-        prev_hash:  GENESIS_PREV_HASH,
+        version: 1,
+        prev_hash: GENESIS_PREV_HASH,
         merkle_root: [0u8; 32],
-        timestamp:  GENESIS_TIMESTAMP,
+        timestamp: GENESIS_TIMESTAMP,
         difficulty: GENESIS_BITS,
-        nonce:      GENESIS_NONCE,
-        height:     GENESIS_HEIGHT,
+        nonce: GENESIS_NONCE,
+        height: GENESIS_HEIGHT,
     };
 
     let coinbase = CoinbaseTx {
         height: GENESIS_HEIGHT,
-        reward: 0, // No pre-mine
+        reward: 0,                                       // No pre-mine
         miner_output_key: CompressedEdwardsY::default(), // Subbed out, address ignored for pure genesis
         genesis_message: GENESIS_MESSAGE.to_vec(),
     };

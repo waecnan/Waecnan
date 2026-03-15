@@ -2,3 +2,10 @@
 name = "waecan-cli"
 version.workspace = true
 edition.workspace = true
+
+[dependencies]
+waecan-wallet = { path = "../waecan-wallet" }
+waecan-rpc = { path = "../waecan-rpc" }
+serde_json = "1"
+clap = { version = "4", features = ["derive"] }
+hex = "0.4"

@@ -6,8 +6,8 @@ use waecan_crypto::pedersen::verify_balance;
 use crate::error::CoreError;
 use crate::transaction::{Transaction, MIN_FEE_ATOMIC};
 
-pub const FEE_BURN_RATIO: u64 = 70;   // 70% burned
-pub const FEE_MINER_RATIO: u64 = 30;  // 30% to block producer
+pub const FEE_BURN_RATIO: u64 = 70; // 70% burned
+pub const FEE_MINER_RATIO: u64 = 30; // 30% to block producer
 
 /// Validate a transaction against all 11 consensus rules from Section 3.4.
 pub fn validate_transaction(

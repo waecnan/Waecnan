@@ -146,7 +146,8 @@ pub fn validate_block(block: &Block, ctx: &BlockValidationContext) -> Result<(),
     for tx in &block.transactions {
         total_fee += tx.fee;
     }
-    let expected_reward = block_reward(block.header.height) + (total_fee * crate::validation::FEE_MINER_RATIO / 100);
+    let expected_reward =
+        block_reward(block.header.height) + (total_fee * crate::validation::FEE_MINER_RATIO / 100);
     if block.coinbase.reward != expected_reward {
         return Err(CoreError::InvalidCoinbaseReward);
     }

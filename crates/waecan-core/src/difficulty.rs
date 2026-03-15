@@ -76,7 +76,7 @@ pub fn u128_to_compact(target: u128) -> u64 {
         return 0;
     }
     let bits_needed = 128 - target.leading_zeros();
-    let exponent = (bits_needed + 7) / 8;
+    let exponent = bits_needed.div_ceil(8);
     let mantissa = if exponent <= 3 {
         (target << (8 * (3 - exponent))) as u64
     } else {

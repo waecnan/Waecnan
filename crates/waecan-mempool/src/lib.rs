@@ -37,7 +37,7 @@ fn compute_txid(tx: &Transaction) -> [u8; 32] {
         hasher.update(output.output_key.as_bytes());
     }
     hasher.update(&tx.fee.to_le_bytes());
-    hasher.update(&tx.tx_public_key.as_bytes());
+    hasher.update(tx.tx_public_key.as_bytes());
     let mut out = [0u8; 32];
     hasher.finalize(&mut out);
     out

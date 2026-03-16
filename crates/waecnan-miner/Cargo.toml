@@ -1,0 +1,11 @@
+[package]
+name = "waecnan-miner"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+waecnan-core = { path = "../waecnan-core" }
+waecnan-crypto = { path = "../waecnan-crypto" }
+randomx-rs = "1.2"
+tiny-keccak = { version = "2.0", features = ["keccak"] }
+curve25519-dalek = { version = "4.1", features = ["digest"] }

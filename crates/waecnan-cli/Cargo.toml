@@ -1,0 +1,11 @@
+[package]
+name = "waecnan-cli"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+waecnan-wallet = { path = "../waecnan-wallet" }
+waecnan-rpc = { path = "../waecnan-rpc" }
+serde_json = "1"
+clap = { version = "4", features = ["derive"] }
+hex = "0.4"

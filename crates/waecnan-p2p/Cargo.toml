@@ -1,0 +1,11 @@
+[package]
+name = "waecnan-p2p"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+libp2p = { version = "0.53", features = [
+    "tcp", "noise", "yamux", "kad", "gossipsub", "identify",
+    "tokio", "macros"
+]}
+tokio = { version = "1.38", features = ["full"] }

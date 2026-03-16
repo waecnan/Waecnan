@@ -1,0 +1,15 @@
+[package]
+name = "waecnan-node"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+waecnan-core = { path = "../waecnan-core" }
+waecnan-storage = { path = "../waecnan-storage" }
+waecnan-mempool = { path = "../waecnan-mempool" }
+waecnan-miner = { path = "../waecnan-miner" }
+waecnan-p2p = { path = "../waecnan-p2p" }
+waecnan-rpc = { path = "../waecnan-rpc" }
+waecnan-wallet = { path = "../waecnan-wallet" }
+tokio = { version = "1.38", features = ["full"] }
+serde_json = "1"

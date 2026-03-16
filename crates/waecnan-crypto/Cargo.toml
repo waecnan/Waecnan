@@ -1,0 +1,16 @@
+[package]
+name = "waecnan-crypto"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+curve25519-dalek = { version = "4.1" }
+sha2 = "0.10"
+tiny-keccak = { version = "2.0", features = ["keccak"] }
+rand_chacha = "0.3"
+rand = "0.8"
+bech32 = "0.11"
+hex = "0.4"
+thiserror = "1.0"
+hmac = "0.12"

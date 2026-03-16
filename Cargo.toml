@@ -1,15 +1,15 @@
 [workspace]
 members = [
-  "crates/waecan-crypto",
-  "crates/waecan-core",
-  "crates/waecan-storage",
-  "crates/waecan-mempool",
-  "crates/waecan-p2p",
-  "crates/waecan-rpc",
-  "crates/waecan-miner",
-  "crates/waecan-wallet",
-  "crates/waecan-node",
-  "crates/waecan-cli",
+  "crates/waecnan-crypto",
+  "crates/waecnan-core",
+  "crates/waecnan-storage",
+  "crates/waecnan-mempool",
+  "crates/waecnan-p2p",
+  "crates/waecnan-rpc",
+  "crates/waecnan-miner",
+  "crates/waecnan-wallet",
+  "crates/waecnan-node",
+  "crates/waecnan-cli",
 ]
 resolver = "2"
 

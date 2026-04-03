@@ -245,7 +245,7 @@ mod tests {
             tip_hash: [0u8; 32],
             last_11_timestamps: vec![now - 1320; 11],
             known_key_images: HashSet::new(),
-            anchor_bits: 1,
+            anchor_bits: 0x2007_FFFF,
             anchor_height: 0,
             anchor_timestamp: now - 120,
             prev_height: 0,

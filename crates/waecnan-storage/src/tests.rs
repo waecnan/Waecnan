@@ -24,7 +24,7 @@ fn dummy_block(height: u64) -> Block {
             prev_hash: [0u8; 32],
             merkle_root: [0u8; 32],
             timestamp: 1234567890,
-            difficulty: 1,
+            difficulty: 0x2007_FFFF,
             nonce: 0,
             height,
         },

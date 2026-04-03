@@ -63,6 +63,7 @@ pub fn build_block_template(
 /// Mine a block by incrementing the nonce until PoW is valid.
 pub fn mine_block(mut template: BlockTemplate, seed_hash: [u8; 32]) -> Block {
     loop {
+        template.header.nonce += 1;
         let pow_hash = compute_pow(&template.header, &seed_hash);
         if is_pow_valid(&template.header, &pow_hash) {
             return Block {
@@ -71,7 +72,13 @@ pub fn mine_block(mut template: BlockTemplate, seed_hash: [u8; 32]) -> Block {
                 transactions: template.transactions,
             };
         }
-        template.header.nonce += 1;
+        if template.header.nonce % 100_000 == 0 {
+            eprintln!(
+                "[miner] nonce={} hash={:02x}{:02x}{:02x}{:02x}...",
+                template.header.nonce,
+                pow_hash[31], pow_hash[30], pow_hash[29], pow_hash[28]
+            );
+        }
     }
 }
 
@@ -143,7 +150,8 @@ mod tests {
     #[test]
     fn test_build_block_template_height_and_reward() {
         let miner_key = ED25519_BASEPOINT_POINT.compress();
-        let template = build_block_template([0u8; 32], 0, 1_700_000_000, 1, vec![], miner_key);
+        let template =
+            build_block_template([0u8; 32], 0, 1_700_000_000, 0x2007_FFFF, vec![], miner_key);
         assert_eq!(template.header.height, 0);
         assert_eq!(template.coinbase.reward, 50 * ATOMIC_UNITS_PER_WAEC);
     }
@@ -178,7 +186,7 @@ mod tests {
             [0u8; 32],
             0,
             1_700_000_000,
-            1, // difficulty=1 → max target, any nonce works
+            0x2007_FFFF, // easy compact target
             vec![],
             miner_key,
         );

@@ -1,22 +1,27 @@
 use crate::block::BlockHeader;
 use randomx_rs::{RandomXCache, RandomXFlag, RandomXVM};
 
-#[allow(clippy::needless_range_loop)]
-pub fn compact_to_target(difficulty: u64) -> [u8; 32] {
-    if difficulty <= 1 {
-        return [0xFF; 32];
-    }
-    let divisor = difficulty as u128;
-    let mut quotient_be = [0u8; 32];
-    let mut remainder: u128 = 0;
-    for i in 0..32 {
-        remainder = (remainder << 8) | 0xFF;
-        quotient_be[i] = (remainder / divisor) as u8;
-        remainder %= divisor;
-    }
+/// Decode a compact (nBits) difficulty value into a 256-bit target.
+/// Format: highest byte = exponent (number of bytes), lower 3 bytes = mantissa.
+/// target = mantissa * 2^(8 * (exponent - 3))
+/// Stored as little-endian [u8; 32].
+pub fn compact_to_target(bits: u64) -> [u8; 32] {
+    let exponent = ((bits >> 24) & 0xFF) as usize;
+    let mantissa = (bits & 0x007F_FFFF) as u64;
+
     let mut target = [0u8; 32];
-    for i in 0..32 {
-        target[i] = quotient_be[31 - i];
+    if exponent == 0 {
+        return target;
+    }
+
+    // Place mantissa bytes (big-endian, 3 bytes) at the correct position.
+    // In LE layout, the MSB of the mantissa goes to byte index (exponent - 1).
+    let mantissa_bytes = mantissa.to_be_bytes(); // 8 bytes, we want last 3
+    for j in 0..3 {
+        let byte_pos = exponent.saturating_sub(1 + j);
+        if byte_pos < 32 {
+            target[byte_pos] = mantissa_bytes[5 + j];
+        }
     }
     target
 }
@@ -52,13 +57,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_is_pow_valid_passes() {
+    fn test_is_pow_valid_passes_easy_target() {
+        // 0x2007FFFF: exponent=32, mantissa=0x07FFFF → near-max target (easiest)
         let header = BlockHeader {
             version: 1,
             prev_hash: [0; 32],
             merkle_root: [0; 32],
             timestamp: 0,
-            difficulty: 1,
+            difficulty: 0x2007_FFFF,
             nonce: 0,
             height: 0,
         };
@@ -67,17 +73,27 @@ mod tests {
     }
 
     #[test]
-    fn test_is_pow_valid_fails() {
+    fn test_is_pow_valid_fails_hard_target() {
+        // 0x0100_0001: exponent=1, mantissa=1 → target is 1 (nearly impossible)
         let header = BlockHeader {
             version: 1,
             prev_hash: [0; 32],
             merkle_root: [0; 32],
             timestamp: 0,
-            difficulty: u64::MAX,
+            difficulty: 0x0100_0001,
             nonce: 0,
             height: 0,
         };
         let hash = [0xFF; 32];
         assert!(!is_pow_valid(&header, &hash));
+    }
+
+    #[test]
+    fn test_compact_to_target_max_difficulty() {
+        // 0x2007FFFF should produce a target with 0x07FFFF at bytes 29,30,31
+        let target = compact_to_target(0x2007_FFFF);
+        assert_eq!(target[31], 0x07);
+        assert_eq!(target[30], 0xFF);
+        assert_eq!(target[29], 0xFF);
     }
 }

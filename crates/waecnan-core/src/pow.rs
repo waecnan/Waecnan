@@ -6,7 +6,7 @@ use randomx_rs::{RandomXCache, RandomXFlag, RandomXVM};
 /// target = mantissa * 2^(8 * (exponent - 3))
 pub fn compact_to_target_bytes(bits: u64) -> [u8; 32] {
     let exponent = (bits >> 24) as usize;
-    let mantissa = (bits & 0x007F_FFFF) as u64;
+    let mantissa = bits & 0x007F_FFFF;
     let mut target = [0u8; 32];
     if exponent == 0 || exponent > 32 {
         return target;

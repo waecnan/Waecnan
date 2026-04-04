@@ -75,8 +75,7 @@ pub fn mine_block(mut template: BlockTemplate, seed_hash: [u8; 32]) -> Block {
         if template.header.nonce.is_multiple_of(100_000) {
             eprintln!(
                 "[miner] nonce={} hash={:02x}{:02x}{:02x}{:02x}...",
-                template.header.nonce,
-                pow_hash[31], pow_hash[30], pow_hash[29], pow_hash[28]
+                template.header.nonce, pow_hash[31], pow_hash[30], pow_hash[29], pow_hash[28]
             );
         }
     }

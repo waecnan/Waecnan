@@ -46,10 +46,8 @@ pub fn validate_transaction(
         }
 
         // 6. For each input: MLSAG ring signature is valid
-        // The message is the hash of the whole transaction structure sans signatures.
-        // For testing, we mock the message hash or rely on the signature verification.
-        // In full consensus, `tx_hash_for_sig(tx)` would be passed here.
-        let msg = [0u8; 32]; // Stub message for validation structure testing
+        // The message is the transaction hash (excluding signatures).
+        let msg = crate::block_validation::hash_transaction(tx);
         if waecnan_crypto::ring_sig::mlsag_verify(&input.ring, &input.ring_sig, &msg).is_err() {
             return Err(CoreError::InvalidRingSignature);
         }
@@ -112,19 +110,17 @@ mod tests {
     use waecnan_crypto::ring_sig::{mlsag_sign, Ring, RingMember};
 
     fn make_valid_tx() -> Transaction {
+        use crate::block_validation::hash_transaction;
         let mut rng = ChaCha20Rng::from_seed([42u8; 32]);
         let mut spend_bytes = [0u8; 32];
         rand::RngCore::fill_bytes(&mut rng, &mut spend_bytes);
-        // Ensure the scalar is valid and reduced
         let spend_priv = curve25519_dalek::scalar::Scalar::from_bytes_mod_order(spend_bytes);
         let spend_pub = &spend_priv * &ED25519_BASEPOINT_POINT;
 
-        // Make pseudo commit = 100 WAEC
         let b_in = curve25519_dalek::scalar::Scalar::from(1u64);
         let pseudo_commit = PedersenCommitment::commit(100 * MIN_FEE_ATOMIC, &b_in);
 
-        // Make output = 99 WAEC (1 WAEC fee)
-        let b_out = curve25519_dalek::scalar::Scalar::from(1u64); // blindings sum
+        let b_out = curve25519_dalek::scalar::Scalar::from(1u64);
         let out_commit = PedersenCommitment::commit(99 * MIN_FEE_ATOMIC, &b_out);
 
         let mut members = Vec::new();
@@ -133,39 +129,42 @@ mod tests {
                 output_key: spend_pub,
             });
         }
-        members.insert(
-            0,
-            RingMember {
-                output_key: spend_pub,
-            },
-        );
+        members.insert(0, RingMember { output_key: spend_pub });
         let ring = Ring { members };
-        let msg = [0u8; 32]; // matched in validation.rs
-        let ring_sig = mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng).expect("Failed to sign");
 
-        let input = TransactionInput {
-            ring,
-            key_image: (&spend_priv * waecnan_crypto::hash::hash_to_point(&spend_pub.compress()))
-                .compress(),
-            ring_sig,
-            pseudo_commit,
-        };
+        let key_image =
+            (&spend_priv * waecnan_crypto::hash::hash_to_point(&spend_pub.compress())).compress();
 
         let output = TransactionOutput {
             output_key: spend_pub.compress(),
             commitment: out_commit,
-            range_proof: vec![1, 2, 3], // valid stub
+            range_proof: vec![1, 2, 3],
             encrypted_amount: [0u8; 8],
         };
 
-        Transaction {
+        // Build a placeholder tx to compute the hash for signing
+        let dummy_sig = mlsag_sign(&ring, 0, &spend_priv, &[0u8; 32], &mut rng)
+            .expect("Failed to sign");
+        let mut tx = Transaction {
             version: 1,
-            inputs: vec![input],
+            inputs: vec![TransactionInput {
+                ring: ring.clone(),
+                key_image,
+                ring_sig: dummy_sig,
+                pseudo_commit,
+            }],
             outputs: vec![output],
             fee: MIN_FEE_ATOMIC,
             tx_public_key: spend_pub.compress(),
             extra: vec![],
-        }
+        };
+
+        // Now sign with the real tx hash
+        let msg = hash_transaction(&tx);
+        let real_sig = mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng)
+            .expect("Failed to sign");
+        tx.inputs[0].ring_sig = real_sig;
+        tx
     }
 
     #[test]

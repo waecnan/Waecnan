@@ -216,16 +216,9 @@ mod tests {
             });
         }
         let ring = Ring { members };
-        let msg = [0u8; 32];
-        let ring_sig = mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng).expect("sign failed");
 
-        let input = TransactionInput {
-            ring,
-            key_image: (&spend_priv * waecnan_crypto::hash::hash_to_point(&spend_pub.compress()))
-                .compress(),
-            ring_sig,
-            pseudo_commit,
-        };
+        let key_image =
+            (&spend_priv * waecnan_crypto::hash::hash_to_point(&spend_pub.compress())).compress();
 
         let output = TransactionOutput {
             output_key: spend_pub.compress(),
@@ -234,14 +227,29 @@ mod tests {
             encrypted_amount: [0u8; 8],
         };
 
-        Transaction {
+        // Build tx with dummy signature to compute hash
+        let dummy_sig =
+            mlsag_sign(&ring, 0, &spend_priv, &[0u8; 32], &mut rng).expect("sign failed");
+        let mut tx = Transaction {
             version: 1,
-            inputs: vec![input],
+            inputs: vec![TransactionInput {
+                ring: ring.clone(),
+                key_image,
+                ring_sig: dummy_sig,
+                pseudo_commit,
+            }],
             outputs: vec![output],
             fee,
             tx_public_key: spend_pub.compress(),
             extra: vec![],
-        }
+        };
+
+        // Re-sign with the real transaction hash
+        let msg = waecnan_core::block_validation::hash_transaction(&tx);
+        let real_sig =
+            mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng).expect("sign failed");
+        tx.inputs[0].ring_sig = real_sig;
+        tx
     }
 
     #[test]

@@ -246,8 +246,7 @@ mod tests {
 
         // Re-sign with the real transaction hash
         let msg = waecnan_core::block_validation::hash_transaction(&tx);
-        let real_sig =
-            mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng).expect("sign failed");
+        let real_sig = mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng).expect("sign failed");
         tx.inputs[0].ring_sig = real_sig;
         tx
     }

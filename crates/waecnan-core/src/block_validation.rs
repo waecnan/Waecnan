@@ -238,8 +238,7 @@ mod tests {
 
         // Sign with the real tx hash
         let msg = hash_transaction(&tx);
-        let real_sig =
-            mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng).expect("sign failed");
+        let real_sig = mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng).expect("sign failed");
         tx.inputs[0].ring_sig = real_sig;
         tx
     }

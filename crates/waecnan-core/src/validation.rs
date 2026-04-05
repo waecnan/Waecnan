@@ -129,7 +129,12 @@ mod tests {
                 output_key: spend_pub,
             });
         }
-        members.insert(0, RingMember { output_key: spend_pub });
+        members.insert(
+            0,
+            RingMember {
+                output_key: spend_pub,
+            },
+        );
         let ring = Ring { members };
 
         let key_image =
@@ -143,8 +148,8 @@ mod tests {
         };
 
         // Build a placeholder tx to compute the hash for signing
-        let dummy_sig = mlsag_sign(&ring, 0, &spend_priv, &[0u8; 32], &mut rng)
-            .expect("Failed to sign");
+        let dummy_sig =
+            mlsag_sign(&ring, 0, &spend_priv, &[0u8; 32], &mut rng).expect("Failed to sign");
         let mut tx = Transaction {
             version: 1,
             inputs: vec![TransactionInput {
@@ -161,8 +166,7 @@ mod tests {
 
         // Now sign with the real tx hash
         let msg = hash_transaction(&tx);
-        let real_sig = mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng)
-            .expect("Failed to sign");
+        let real_sig = mlsag_sign(&ring, 0, &spend_priv, &msg, &mut rng).expect("Failed to sign");
         tx.inputs[0].ring_sig = real_sig;
         tx
     }

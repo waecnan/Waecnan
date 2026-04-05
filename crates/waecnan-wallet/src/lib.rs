@@ -84,14 +84,14 @@ pub fn scan_block(keys: &WalletKeys, block: &Block) -> Vec<OwnedOutput> {
                 &keys.view_private,
                 &keys.spend_public,
                 &output_key,
-                output_idx,
+                idx,
             ) {
                 // Derive the one-time private key to compute the key image
                 let output_priv = derive_output_private_key(
                     &tx_pub,
                     &keys.view_private,
                     &keys.spend_private,
-                    output_idx,
+                    idx,
                 );
                 let hp = hash_to_point(&output_key.compress());
                 let key_image = (output_priv * hp).compress();

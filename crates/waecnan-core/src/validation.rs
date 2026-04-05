@@ -130,18 +130,21 @@ mod tests {
         let b_out = curve25519_dalek::scalar::Scalar::from(1u64);
         let out_commit = PedersenCommitment::commit(99 * MIN_FEE_ATOMIC, &b_out);
 
+        // Generate 11 distinct ring members (VULN-03 fix: no duplicates)
         let mut members = Vec::new();
-        for _ in 0..10 {
+        for i in 0..11usize {
+            let mut decoy_bytes = [0u8; 32];
+            decoy_bytes[0] = (i + 1) as u8;
+            let decoy_priv = curve25519_dalek::scalar::Scalar::from_bytes_mod_order(decoy_bytes);
+            let decoy_pub = &decoy_priv * &ED25519_BASEPOINT_POINT;
             members.push(RingMember {
-                output_key: spend_pub,
+                output_key: decoy_pub,
             });
         }
-        members.insert(
-            0,
-            RingMember {
-                output_key: spend_pub,
-            },
-        );
+        // Replace slot 0 with the real signer's key
+        members[0] = RingMember {
+            output_key: spend_pub,
+        };
         let ring = Ring { members };
 
         let key_image =

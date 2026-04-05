@@ -226,7 +226,7 @@ mod tests {
         let mut sec_bytes = [0u8; 64];
         rng.fill_bytes(&mut sec_bytes);
         let tx_secret = Scalar::from_bytes_mod_order_wide(&sec_bytes);
-        let (output_key, _) = compute_output_key(&tx_secret, &view.public, &spend.public);
+        let (output_key, _) = compute_output_key(&tx_secret, &view.public, &spend.public, 0);
 
         let shared = tx_secret * view.public;
         let hs = crate::hash::keccak256_to_scalar(shared.compress().as_bytes());

@@ -210,11 +210,18 @@ mod tests {
         let out_commit = PedersenCommitment::commit(100 * MIN_FEE_ATOMIC - fee, &b_out);
 
         let mut members = Vec::new();
-        for _ in 0..11 {
+        for i in 0..11usize {
+            let mut decoy_bytes = [0u8; 32];
+            decoy_bytes[0] = (i + 1) as u8;
+            let decoy_priv = curve25519_dalek::scalar::Scalar::from_bytes_mod_order(decoy_bytes);
+            let decoy_pub = &decoy_priv * &curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
             members.push(RingMember {
-                output_key: spend_pub,
+                output_key: decoy_pub,
             });
         }
+        members[0] = RingMember {
+            output_key: spend_pub,
+        };
         let ring = Ring { members };
 
         let key_image =
